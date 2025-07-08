@@ -1,23 +1,24 @@
 document.addEventListener('DOMContentLoaded', function () {
   // DOM元素
-  const startDateInput = document.getElementById('startDate');
-  const endDateInput = document.getElementById('endDate');
-  const filterBtn = document.getElementById('filterBtn');
-  const fuelTableWrap = document.getElementById('fuelTableWrap');
-  const cpiTableWrap = document.getElementById('cpiTableWrap');
-  const cpiModeBtn = document.getElementById('cpiModeBtn');
-  const fuelTypeBtns = Array.from(document.querySelectorAll('.fuelTypeBtn[data-type]'));
-  const fuelTypeAllBtn = document.getElementById('fuelTypeAllBtn');
-  let chart = null;
+  // 取得日期選擇、查詢、表格、CPI切換、油種按鈕等相關的DOM元素
+  const startDateInput = document.getElementById('startDate'); // 開始日期輸入框
+  const endDateInput = document.getElementById('endDate');     // 結束日期輸入框
+  const filterBtn = document.getElementById('filterBtn');      // 查詢按鈕
+  const fuelTableWrap = document.getElementById('fuelTableWrap'); // 油價表格區塊
+  const cpiTableWrap = document.getElementById('cpiTableWrap');   // CPI表格區塊
+  const cpiModeBtn = document.getElementById('cpiModeBtn');       // 切換CPI模式按鈕
+  const fuelTypeBtns = Array.from(document.querySelectorAll('.fuelTypeBtn[data-type]')); // 各油種按鈕
+  const fuelTypeAllBtn = document.getElementById('fuelTypeAllBtn'); // 全選油種按鈕
+  let chart = null; // Chart.js 圖表實例
 
   // 狀態變數
-  let isCpiMode = false;
-  let allData = [];
-  const FUEL_TYPES = ['92無鉛汽油', '95無鉛汽油', '98無鉛汽油', '柴油'];
-  let selectedFuelTypes = FUEL_TYPES.slice(); // 油價模式下的選中油種
-  let selectedCpiFuel = '柴油'; // CPI模式下的選中油種
+  let isCpiMode = false; // 是否為CPI模式
+  let allData = [];      // 所有油價資料
+  const FUEL_TYPES = ['92無鉛汽油', '95無鉛汽油', '98無鉛汽油', '柴油']; // 油種列表
+  let selectedFuelTypes = FUEL_TYPES.slice(); // 油價模式下選中的油種（多選）
+  let selectedCpiFuel = '柴油'; // CPI模式下選中的油種（單選）
 
-  // 顏色映射
+  // 顏色映射，對應每種油種的顏色，供按鈕和折線圖使用
   const colorMap = {
     '92無鉛汽油': 'rgba(255,99,132,1)',
     '95無鉛汽油': 'rgba(54,162,235,1)',
@@ -26,11 +27,12 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 
   // 設定預設日期範圍（近5年）
+  // 預設顯示近五年資料，將日期欄位設為對應值
   function setDefaultDateRange() {
     const now = new Date();
-    const endDate = now.toISOString().split('T')[0];
+    const endDate = now.toISOString().split('T')[0]; // 今天
     const fiveYearsAgo = new Date(now.getFullYear() - 5, now.getMonth(), now.getDate());
-    const startDate = fiveYearsAgo.toISOString().split('T')[0];
+    const startDate = fiveYearsAgo.toISOString().split('T')[0]; // 五年前
 
     startDateInput.value = startDate;
     endDateInput.value = endDate;
