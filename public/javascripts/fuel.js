@@ -294,38 +294,50 @@ document.addEventListener('DOMContentLoaded', function () {
     const formData = new FormData(addForm);
     const payload = {
       date: formData.get('date'),
-      fuel92: formData.get('fuel92'),
-      fuel95: formData.get('fuel95'),
-      fuel98: formData.get('fuel98'),
-      diesel: formData.get('diesel')
+      fuel92: parseFloat(formData.get('fuel92')),
+      fuel95: parseFloat(formData.get('fuel95')),
+      fuel98: parseFloat(formData.get('fuel98')),
+      diesel: parseFloat(formData.get('diesel'))
     };
+
+    // 前端資料驗證
+    if (!payload.date) {
+      alert('請選擇日期');
+      return;
+    }
+
+    const prices = [payload.fuel92, payload.fuel95, payload.fuel98, payload.diesel];
+    if (prices.some(price => isNaN(price) || price <= 0)) {
+      alert('所有油價必須為正數');
+      return;
+    }
 
     fetch('/api/fuel_price', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
       },
       body: JSON.stringify(payload)
     })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('新增資料失敗');
-        }
-        return res.json();
-      })
-      .then(result => {
-        if (result.success) {
-          addModal.style.display = 'none';
-          addForm.reset();
-          return fetchFuelData(); // 確保獲取最新資料
-        }
-      })
-      .catch(err => {
-        console.error('新增資料錯誤:', err);
-        alert('新增資料失敗，請重試');
-      });
-
+    .then(res => {
+      if (!res.ok) {
+        return res.json().then(err => Promise.reject(err));
+      }
+      return res.json();
+    })
+    .then(result => {
+      if (result.success) {
+        alert('新增成功！');
+        addModal.style.display = 'none';
+        addForm.reset();
+        // 重新載入資料
+        return fetchFuelData();
+      }
+    })
+    .catch(err => {
+      console.error('新增資料錯誤:', err);
+      alert(err.error || '新增資料失敗，請重試');
+    });
   });
 
   // 取得最舊日期
@@ -353,6 +365,7 @@ document.addEventListener('DOMContentLoaded', function () {
       render();
     }
   });
+
   endDateInput.addEventListener('change', function() {
     const minDate = getMinDate();
     if (minDate && endDateInput.value < minDate) {

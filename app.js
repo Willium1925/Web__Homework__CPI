@@ -45,18 +45,32 @@ app.get('/api/fuel_price', (req, res) => {
 
 app.post('/api/fuel_price', (req, res) => {
   const { date, fuel92, fuel95, fuel98, diesel } = req.body;
+
+  // 驗證所有必要欄位
   if (!date || !fuel92 || !fuel95 || !fuel98 || !diesel) {
-    res.status(400).json({ error: '缺少必要欄位' });
-    return;
+    return res.status(400).json({ error: '所有欄位都是必填的' });
   }
-  // 寫入資料庫（起始日期與結束日期都設為 date）
-  const sql = `INSERT INTO fuel_price (起始日期, 結束日期, 汽油_92, 汽油_95, 汽油_98, 超級柴油) VALUES (?, ?, ?, ?, ?, ?)`;
-  db.run(sql, [date, date, fuel92, fuel95, fuel98, diesel], function (err) {
+
+  // 驗證數值欄位
+  const prices = [fuel92, fuel95, fuel98, diesel];
+  if (!prices.every(price => !isNaN(price) && price > 0)) {
+    return res.status(400).json({ error: '油價必須為正數' });
+  }
+
+  // 寫入資料庫
+  const sql = `INSERT INTO fuel_price (起始日期, 結束日期, 汽油_92, 汽油_95, 汽油_98, 超級柴油) 
+               VALUES (?, ?, ?, ?, ?, ?)`;
+
+  db.run(sql, [date, date, fuel92, fuel95, fuel98, diesel], function(err) {
     if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+      console.error('資料庫寫入錯誤:', err);
+      return res.status(500).json({ error: '資料庫寫入失敗' });
     }
-    res.json({ success: true, id: this.lastID });
+    res.json({
+      success: true,
+      id: this.lastID,
+      message: '新增成功'
+    });
   });
 });
 
