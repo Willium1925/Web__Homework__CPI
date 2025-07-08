@@ -300,4 +300,20 @@ document.addEventListener('DOMContentLoaded', function () {
   setDefaultDateRange();
   updateButtonStyles();
   fetchFuelData();
+
+  // 日期欄位變動即時渲染
+  startDateInput.addEventListener('change', function() {
+    if (isCpiMode) {
+      fetchCpiData();
+    } else {
+      render();
+    }
+  });
+  endDateInput.addEventListener('change', function() {
+    if (isCpiMode) {
+      fetchCpiData();
+    } else {
+      render();
+    }
+  });
 });
