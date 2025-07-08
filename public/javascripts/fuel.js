@@ -304,6 +304,12 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   });
 
+  // 取得最舊日期
+  function getMinDate() {
+    if (!allData.length) return null;
+    return allData.reduce((min, row) => row.date < min ? row.date : min, allData[0].date);
+  }
+
   // 初始化
   setDefaultDateRange();
   updateButtonStyles();
@@ -311,6 +317,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // 日期欄位變動即時渲染
   startDateInput.addEventListener('change', function() {
+    const minDate = getMinDate();
+    if (minDate && startDateInput.value < minDate) {
+      alert(`請選擇${minDate}之後`);
+      startDateInput.value = minDate;
+      return;
+    }
     if (isCpiMode) {
       fetchCpiData();
     } else {
@@ -318,6 +330,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
   endDateInput.addEventListener('change', function() {
+    const minDate = getMinDate();
+    if (minDate && endDateInput.value < minDate) {
+      alert(`請選擇${minDate}之後`);
+      endDateInput.value = minDate;
+      return;
+    }
     if (isCpiMode) {
       fetchCpiData();
     } else {
