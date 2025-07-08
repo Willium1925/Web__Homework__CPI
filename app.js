@@ -113,7 +113,7 @@ app.get('/api/cpi', (req, res) => {
     const chartData = sortedYears.map(year => ({
       year,
       avg: yearAvg[year],
-      cpi: baseValue ? (yearAvg[year] / baseValue) : 0
+      cpi: baseValue ? (yearAvg[year] - baseValue) / baseValue : 0 // 以百分比變動表示，正負皆可
     }));
     // 表格資料：新到舊
     const tableData = [...chartData].reverse();

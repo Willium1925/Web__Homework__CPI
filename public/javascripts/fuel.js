@@ -10,14 +10,14 @@ document.addEventListener('DOMContentLoaded', function () {
   const fuelTypeAllBtn = document.getElementById('fuelTypeAllBtn');
   let chart = null;
 
-  // 状态变量
+  // 狀態變數
   let isCpiMode = false;
   let allData = [];
   const FUEL_TYPES = ['92無鉛汽油', '95無鉛汽油', '98無鉛汽油', '柴油'];
-  let selectedFuelTypes = FUEL_TYPES.slice(); // 油价模式下的选中油种
-  let selectedCpiFuel = '柴油'; // CPI模式下的选中油种
+  let selectedFuelTypes = FUEL_TYPES.slice(); // 油價模式下的選中油種
+  let selectedCpiFuel = '柴油'; // CPI模式下的選中油種
 
-  // 颜色映射
+  // 顏色映射
   const colorMap = {
     '92無鉛汽油': 'rgba(255,99,132,1)',
     '95無鉛汽油': 'rgba(54,162,235,1)',
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     '柴油': 'rgba(75,192,192,1)'
   };
 
-  // 设置默认日期范围（近5年）
+  // 設定預設日期範圍（近5年）
   function setDefaultDateRange() {
     const now = new Date();
     const endDate = now.toISOString().split('T')[0];
@@ -36,10 +36,10 @@ document.addEventListener('DOMContentLoaded', function () {
     endDateInput.value = endDate;
   }
 
-  // 更新按钮样式
+  // 更新按鈕樣式
   function updateButtonStyles() {
     if (isCpiMode) {
-      // CPI模式：单选
+      // CPI模式：單選
       fuelTypeBtns.forEach(btn => {
         const type = btn.dataset.type;
         if (type === selectedCpiFuel) {
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       fuelTypeAllBtn.style.display = 'none';
     } else {
-      // 油价模式：多选
+      // 油價模式：多選
       fuelTypeBtns.forEach(btn => {
         const type = btn.dataset.type;
         if (selectedFuelTypes.includes(type)) {
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // 油价数据相关函数
+  // 油價數據相關函數
   function fetchFuelData() {
     return fetch('/api/fuel_price')
       .then(res => res.json())
@@ -95,17 +95,19 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function renderFuelTable(data) {
-    // 更新表头以显示所有选中的油种
+    // 更新表頭以顯示所有選中的油種
     const tableHead = document.querySelector('#fuelTable thead tr');
     tableHead.innerHTML = `
       <th>日期</th>
       ${selectedFuelTypes.map(type => `<th>${type}</th>`).join('')}
     `;
 
-    // 更新表格内容，每行显示一个日期的所有选中油种数据
+    // 依日期新到舊排序
+    const sorted = [...data].sort((a, b) => b.date.localeCompare(a.date));
+    // 更新表格內容，每行顯示一個日期的所有選中油種數據
     const tableBody = document.querySelector('#fuelTable tbody');
     tableBody.innerHTML = '';
-    data.forEach(row => {
+    sorted.forEach(row => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${row.date}</td>
@@ -116,15 +118,16 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function renderFuelChart(data) {
-    const labels = data.map(row => row.date);
+    // 依日期新到舊排序，然後反轉為左到右新到舊
+    const sorted = [...data].sort((a, b) => b.date.localeCompare(a.date)).reverse();
+    const labels = sorted.map(row => row.date);
     const datasets = selectedFuelTypes.map(type => ({
       label: type,
-      data: data.map(row => row[type]),
+      data: sorted.map(row => row[type]),
       borderColor: colorMap[type],
       fill: false,
       tension: 0.1
     }));
-
     if (chart) chart.destroy();
     chart = new Chart(document.getElementById('fuelChart').getContext('2d'), {
       type: 'line',
@@ -140,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // CPI相关函数
+  // CPI相關函數
   function fetchCpiData() {
     const start = startDateInput.value.slice(0, 4);
     const end = endDateInput.value.slice(0, 4);
@@ -155,29 +158,34 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function renderCpiTable(data) {
+    // 依年度新到舊排序
+    const sorted = [...data].sort((a, b) => b.year.localeCompare(a.year));
     const tableBody = document.querySelector('#cpiTable tbody');
     tableBody.innerHTML = '';
-    data.forEach(row => {
+    sorted.forEach(row => {
+      const color = row.cpi > 0 ? 'red' : (row.cpi < 0 ? 'blue' : 'black');
+      const cpiText = (row.cpi * 100).toFixed(2) + '%';
+      const cpiTd = `<td style="color:${color}">${cpiText}</td>`;
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${row.year}</td>
         <td>${row.avg.toFixed(2)}</td>
-        <td>${(row.cpi * 100).toFixed(2)}%</td>
+        ${cpiTd}
       `;
       tableBody.appendChild(tr);
     });
   }
-
   function renderCpiChart(data) {
-    const labels = data.map(row => row.year);
+    // 依年度新到舊排序，然後反轉為左到右新到舊
+    const sorted = [...data].sort((a, b) => b.year.localeCompare(a.year)).reverse();
+    const labels = sorted.map(row => row.year);
     const datasets = [{
       label: `${selectedCpiFuel}物價指數`,
-      data: data.map(row => row.cpi * 100),
+      data: sorted.map(row => row.cpi * 100),
       borderColor: colorMap[selectedCpiFuel],
       fill: false,
       tension: 0.1
     }];
-
     if (chart) chart.destroy();
     chart = new Chart(document.getElementById('fuelChart').getContext('2d'), {
       type: 'line',
@@ -193,17 +201,17 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // 事件处理
-  // 油种按钮点击事件
+  // 事件處理
+  // 油種按鈕點擊事件
   fuelTypeBtns.forEach(btn => {
     btn.addEventListener('click', function() {
       const type = btn.dataset.type;
       if (isCpiMode) {
-        // CPI模式：单选
+        // CPI模式：單選
         selectedCpiFuel = type;
         fetchCpiData();
       } else {
-        // 油价模式：多选
+        // 油價模式：多選
         if (selectedFuelTypes.includes(type)) {
           if (selectedFuelTypes.length > 1) {
             selectedFuelTypes = selectedFuelTypes.filter(t => t !== type);
@@ -217,7 +225,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
-  // 全选按钮点击事件
+  // 全選按鈕點擊事件
   fuelTypeAllBtn.addEventListener('click', function() {
     if (!isCpiMode) {
       selectedFuelTypes = FUEL_TYPES.slice();
@@ -226,14 +234,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // 切换CPI模式
+  // 切換CPI模式
   cpiModeBtn.addEventListener('click', function() {
     isCpiMode = !isCpiMode;
     if (isCpiMode) {
       fuelTableWrap.style.display = 'none';
       cpiTableWrap.style.display = '';
       cpiModeBtn.textContent = '回到油價查詢';
-      selectedCpiFuel = '柴油'; // 默认选择柴油
+      selectedCpiFuel = '柴油'; // 預設選擇柴油
       fetchCpiData();
     } else {
       fuelTableWrap.style.display = '';
@@ -244,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function () {
     updateButtonStyles();
   });
 
-  // 查询按钮点击事件
+  // 查詢按鈕點擊事件
   filterBtn.addEventListener('click', function() {
     if (isCpiMode) {
       fetchCpiData();
@@ -253,14 +261,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // 渲染油价数据
+  // 渲染油價數據
   function render() {
     const filtered = filterFuelData();
     renderFuelTable(filtered);
     renderFuelChart(filtered);
   }
 
-  // 新增数据相关
+  // 新增數據相關
   const addBtn = document.getElementById('addBtn');
   const addModal = document.getElementById('addModal');
   const addForm = document.getElementById('addForm');
