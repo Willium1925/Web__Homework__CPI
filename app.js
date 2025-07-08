@@ -110,19 +110,11 @@ app.get('/api/cpi', (req, res) => {
     const baseValue = yearAvg[baseYear];
     // 組合回傳格式
     // 折線圖資料：舊到新
-    const chartData = sortedYears.map(year => {
-      let cpi = 0;
-      if (baseValue && baseValue !== 0) {
-        cpi = (yearAvg[year] - baseValue) / Math.abs(baseValue);
-      } else {
-        cpi = 0;
-      }
-      return {
-        year,
-        avg: yearAvg[year],
-        cpi
-      };
-    });
+    const chartData = sortedYears.map(year => ({
+      year,
+      avg: yearAvg[year],
+      cpi: baseValue ? (yearAvg[year] - baseValue) / baseValue : 0 // 以百分比變動表示，正負皆可
+    }));
     // 表格資料：新到舊
     const tableData = [...chartData].reverse();
     res.json({ chart: chartData, table: tableData });
