@@ -1,0 +1,152 @@
+body {
+  padding: 50px;
+  font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.filter-bar {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.fuel-type-btns {
+  display: inline-flex;
+  gap: 10px;
+  margin-right: 20px;
+}
+.fuelTypeBtn, .action-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.action-btn {
+  background: #4a90e2;
+  color: white;
+  margin-left: 8px;
+}
+.action-btn:hover {
+  background: #357abd;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+tr:hover {
+  background-color: #f5f5f5;
+}
+
+#fuelTable {
+  border-collapse: collapse;
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  margin-bottom: 30px;
+}
+#fuelTable th, #fuelTable td {
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  text-align: center;
+}
+#fuelTable th {
+  background: #f5f7fa;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 1.05em;
+}
+#fuelTable tbody tr:nth-child(even) {
+  background: #f9fbfd;
+}
+#fuelTable tbody tr:hover {
+  background: #eaf6ff;
+}
+
+/* 物價指數表格外觀優化，與油價查詢表格一致 */
+#cpiTable {
+  border-collapse: collapse;
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  margin-bottom: 30px;
+}
+#cpiTable th, #cpiTable td {
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  text-align: center;
+}
+#cpiTable th {
+  background: #f5f7fa;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 1.05em;
+}
+#cpiTable tbody tr:nth-child(even) {
+  background: #f9fbfd;
+}
+#cpiTable tbody tr:hover {
+  background: #eaf6ff;
+}
+
+/* 物價指數模式下油種按鈕單選高亮，與主題色一致 */
+.fuel-type-btns .fuelTypeBtn.selected {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  font-weight: bold;
+  outline: 2px solid #333;
+}
+
+input[type="date"] {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.modal {
+  display: none;
+}
+.modal button {
+  padding: 8px 16px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.modal button[type="submit"] {
+  background: #4a90e2;
+  color: white;
+}
+.modal button[type="button"] {
+  background: #e0e0e0;
+  color: #333;
+}
+.modal input {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 150px;
+}

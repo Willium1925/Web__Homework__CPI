@@ -1,0 +1,88 @@
+<html>
+
+<head>
+  <title>Express</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  <h1>全國汽柴油價格查詢</h1>
+  <div class="filter-bar">
+    <span>油種：</span>
+    <div id="fuelTypeBtns" class="fuel-type-btns">
+      <button class="fuelTypeBtn" data-type="92無鉛汽油">92無鉛汽油</button>
+      <button class="fuelTypeBtn" data-type="95無鉛汽油">95無鉛汽油</button>
+      <button class="fuelTypeBtn" data-type="98無鉛汽油">98無鉛汽油</button>
+      <button class="fuelTypeBtn" data-type="柴油">柴油</button>
+      <button class="fuelTypeBtn" id="fuelTypeAllBtn">全部</button>
+    </div>
+    <button id="cpiModeBtn" class="action-btn" style="margin-left:24px;">年度物價指數</button>
+    <span style="margin-left:24px;">日期範圍：
+      <input type="date" id="startDate"> ~ <input type="date" id="endDate">
+    </span>
+    <button id="filterBtn" class="action-btn">查詢</button>
+    <button id="addBtn" class="action-btn" style="float:right;">新增</button>
+  </div>
+  <!-- 新增資料的彈窗 -->
+  <div id="addModal" class="modal" style="display:none;position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.3);z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:24px 32px;border-radius:8px;min-width:320px;max-width:90vw;box-shadow:0 2px 16px rgba(0,0,0,0.15);">
+      <h3>新增油價資料</h3>
+      <form id="addForm">
+        <div style="margin-bottom:10px;">
+          <label>日期：<input type="date" name="date" required></label>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label>92無鉛汽油：<input type="number" name="fuel92" step="0.1" required></label>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label>95無鉛汽油：<input type="number" name="fuel95" step="0.1" required></label>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label>98無鉛汽油：<input type="number" name="fuel98" step="0.1" required></label>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label>超級柴油：<input type="number" name="diesel" step="0.1" required></label>
+        </div>
+        <div style="text-align:right;">
+          <button type="button" id="cancelAddBtn">取消</button>
+          <button type="submit">送出</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div>
+    <canvas id="fuelChart" height="100"></canvas>
+  </div>
+  <div id="fuelTableWrap">
+    <table id="fuelTable" border="1" style="width:100%;margin-top:20px;">
+      <thead>
+        <tr>
+          <th>日期</th>
+          <th>油種</th>
+          <th>價格</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 資料列動態插入 -->
+      </tbody>
+    </table>
+  </div>
+  <div id="cpiTableWrap" style="display:none;">
+    <table id="cpiTable" border="1" style="width:100%;margin-top:20px;">
+      <thead>
+        <tr>
+          <th>年度</th>
+          <th>平均油價</th>
+          <th>當年度物價指數</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- CPI 資料列動態插入 -->
+      </tbody>
+    </table>
+  </div>
+  <script src="/javascripts/fuel.js"></script>
+</body>
+
+</html>
