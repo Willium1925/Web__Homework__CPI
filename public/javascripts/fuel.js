@@ -304,13 +304,28 @@ document.addEventListener('DOMContentLoaded', function () {
       });
   });
 
-  // 初始化
-  setDefaultDateRange();
-  updateButtonStyles();
-  fetchFuelData();
+  // 取得資料庫最舊日期
+  let minDate = null;
+  function fetchMinDate() {
+    return fetch('/api/fuel_price')
+      .then(res => res.json())
+      .then(data => {
+        if (data.length > 0) {
+          minDate = data.map(row => row.date).sort()[0];
+        }
+      });
+  }
 
-  // 日期欄位變動即時渲染
+  // 日期欄位變動即時渲染，並檢查是否小於最舊日期
+  function checkDateLimit(input) {
+    if (minDate && input.value < minDate) {
+      alert(`請選擇 ${minDate} 之後的日期`);
+      input.value = minDate;
+    }
+  }
+
   startDateInput.addEventListener('change', function() {
+    checkDateLimit(startDateInput);
     if (isCpiMode) {
       fetchCpiData();
     } else {
@@ -318,10 +333,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
   endDateInput.addEventListener('change', function() {
+    checkDateLimit(endDateInput);
     if (isCpiMode) {
       fetchCpiData();
     } else {
       render();
     }
   });
+
+  // 初始化
+  setDefaultDateRange();
+  updateButtonStyles();
+  fetchMinDate().then(fetchFuelData);
 });
