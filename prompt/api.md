@@ -9,5 +9,6 @@
 
 
 # 新增
-在 app.js 中，使用 post 方法，撰寫 /api/fuel_price 路由，接收前端傳來的資料，並將資料新增到 fuel_price table 中。需要確認新增成功後回傳成功訊息。
+在 app.js 中，使用 post 方法，撰寫 /api/fuel_price 路由，接收前端傳來的資料，並將資料新增到 fuel_price table 中，且畫面即時渲染
+需要確認新增成功後回傳成功訊息。
 

@@ -78,11 +78,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // 油價數據相關函數
   function fetchFuelData() {
-    return fetch('/api/fuel_price')
+    return fetch('/api/fuel_price', {
+      headers: {
+        'Cache-Control': 'no-cache'
+      }
+    })
       .then(res => res.json())
       .then(data => {
         allData = data;
         render();
+      })
+      .catch(err => {
+        console.error('獲取資料失敗:', err);
       });
   }
 
@@ -295,15 +302,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
     fetch('/api/fuel_price', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      },
       body: JSON.stringify(payload)
     })
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('新增資料失敗');
+        }
+        return res.json();
+      })
       .then(result => {
-        addModal.style.display = 'none';
-        addForm.reset();
-        fetchFuelData();
+        if (result.success) {
+          addModal.style.display = 'none';
+          addForm.reset();
+          return fetchFuelData(); // 確保獲取最新資料
+        }
+      })
+      .catch(err => {
+        console.error('新增資料錯誤:', err);
+        alert('新增資料失敗，請重試');
       });
+
   });
 
   // 取得最舊日期
